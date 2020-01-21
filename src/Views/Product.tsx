@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Text, Button, Tag } from "@chakra-ui/core";
+import { Flex, Heading, Text, Button, Tag } from "@chakra-ui/core";
 import React from "react";
 import { RouteChildrenProps, Redirect, useHistory } from "react-router-dom";
 import { Routes } from "../Routes";
