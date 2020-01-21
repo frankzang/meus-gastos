@@ -12,11 +12,13 @@ export const Configurations: React.FC = () => {
       w="100%"
       h="100%"
     >
-      <Heading>Configurações</Heading>
+      <Heading as="h1" fontSize="24px">
+        Configurações
+      </Heading>
       <Box w="100%" maxW="500" justifyContent="center" mt="32px">
         <Flex justifyContent="center" alignItems="center" flexDir="column">
           <Button onClick={() => eraseData()} size="lg" variantColor="red">
-            Exluir produtos
+            Exluir compras salvas
           </Button>
         </Flex>
       </Box>

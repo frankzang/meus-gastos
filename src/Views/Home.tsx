@@ -22,7 +22,7 @@ export const Home: React.FC = () => {
             alignItems="center"
             marginBottom="48px"
           >
-            <Heading as="h2" size="md" marginBottom="0">
+            <Heading as="h2" size="md" marginBottom="0" marginRight="10px">
               {products.length > 0
                 ? "Compras cadastradas"
                 : "Você ainda não cadastrou compras."}

@@ -7,6 +7,7 @@ import { Home } from "./Views/Home";
 import { ProductsProvider } from "./Context/Products";
 import { Configurations } from "./Views/Configurations";
 import { CreateProduct } from "./Views/CreateProduct";
+import { ProductPage } from "./Views/Product";
 
 const App: React.FC = () => {
   return (
@@ -18,6 +19,10 @@ const App: React.FC = () => {
             <Route exact path={Routes.HOME} component={Home} />
             <Route path={Routes.CREATE_PRODUCT} component={CreateProduct} />
             <Route path={Routes.CONFIGURATIONS} component={Configurations} />
+            <Route
+              path={`${Routes.PRODUCT}/:productId`}
+              component={ProductPage}
+            />
           </Switch>
         </BrowserRouter>
       </ProductsProvider>

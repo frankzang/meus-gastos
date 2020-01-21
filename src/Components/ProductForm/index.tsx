@@ -45,7 +45,7 @@ export const ProductForm: React.FC = () => {
   }
 
   return (
-    <form onSubmit={createProduct}>
+    <form onSubmit={createProduct} autoComplete="off">
       <Flex direction="column">
         <FormControl marginBottom="8px">
           <FormLabel htmlFor="nome">Nome do produto</FormLabel>

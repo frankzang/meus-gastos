@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading, Flex } from "@chakra-ui/core";
+import { Box, Heading, Flex, Text } from "@chakra-ui/core";
 import { useProducts } from "../../Context/Products";
 
 export const TotalSpent: React.FC = () => {
@@ -23,8 +23,9 @@ export const TotalSpent: React.FC = () => {
   return (
     <Flex w="100%" flexDirection="column">
       <Box>
-        <Heading as="h1" size="md" marginBottom="32px">
-          Total gasto este mês: R$ {totalSpent}
+        <Heading as="h1" fontSize="sm" marginBottom="32px">
+          Total gasto este mês:
+          <Text fontSize="40px">R${totalSpent.toFixed(2)}</Text>
         </Heading>
       </Box>
     </Flex>
