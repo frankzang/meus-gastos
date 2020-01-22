@@ -21,20 +21,34 @@ interface ResetProducts {
   type: "RESET";
 }
 
-type Action = SetProducts | AddProduct | RemoveProduct | ResetProducts;
+interface LoadingProducts {
+  type: "LOADING";
+  loading: boolean;
+}
+
+type Action =
+  | SetProducts
+  | AddProduct
+  | RemoveProduct
+  | ResetProducts
+  | LoadingProducts;
 
 interface State {
   products: Product[];
+  loading: boolean;
 }
 
 const initialState: State = {
-  products: []
+  products: [],
+  loading: true
 };
 
 const reducer = (state = initialState, action: Action): State => {
   switch (action.type) {
     case "SET_PRODUCTS":
-      return { ...state, products: action.products };
+      return { ...state, products: action.products, loading: false };
+    case "LOADING":
+      return { ...state, loading: action.loading };
     case "ADD":
       return { ...state, products: [...state.products, action.product] };
     case "REMOVE":

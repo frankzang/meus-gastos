@@ -5,16 +5,17 @@ import {
   Heading,
   Button,
   Input,
-  FormControl
+  FormControl,
+  CircularProgress
 } from "@chakra-ui/core";
 import { useProducts } from "../Context/Products";
 import { ProductCard } from "../Components/ProductCard";
 import { Link } from "react-router-dom";
 import { Routes } from "../Routes";
-import { TotalSpent } from "../Components/TotalSpent";
+import { TotalSpent } from "../Components/Status";
 
 export const Home: React.FC = () => {
-  const { products } = useProducts();
+  const { products, loading } = useProducts();
   const [productsToShow, setProductsToShow] = useState(products);
   const theresProducts = products.length > 0;
 
@@ -59,12 +60,21 @@ export const Home: React.FC = () => {
                 : "Você ainda não cadastrou compras."}
             </Heading>
           </Flex>
-          {productsToShow
-            .filter(Boolean)
-            .reverse()
-            .map(product => {
-              return <ProductCard key={product.id} product={product} />;
-            })}
+          {loading ? (
+            <Flex justifyContent="center">
+              <CircularProgress
+                isIndeterminate
+                color="green"
+              ></CircularProgress>
+            </Flex>
+          ) : (
+            productsToShow
+              .filter(Boolean)
+              .reverse()
+              .map(product => {
+                return <ProductCard key={product.id} product={product} />;
+              })
+          )}
         </Box>
         <Box padding="5">
           <Link to={Routes.CONFIGURATIONS}>Configurações</Link>
