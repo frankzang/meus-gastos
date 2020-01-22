@@ -50,6 +50,7 @@ export const ProductForm: React.FC = () => {
         <FormControl marginBottom="8px">
           <FormLabel htmlFor="nome">Nome do produto</FormLabel>
           <Input
+            autoFocus
             id="nome"
             value={name}
             onChange={updateName}

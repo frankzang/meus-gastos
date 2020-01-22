@@ -1,14 +1,31 @@
-import React from "react";
-import { Box, Flex, Heading, Button } from "@chakra-ui/core";
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Flex,
+  Heading,
+  Button,
+  Input,
+  FormHelperText,
+  FormControl
+} from "@chakra-ui/core";
 import { useProducts } from "../Context/Products";
 import { ProductCard } from "../Components/ProductCard";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Routes } from "../Routes";
 import { TotalSpent } from "../Components/TotalSpent";
 
 export const Home: React.FC = () => {
   const { products } = useProducts();
-  const history = useHistory();
+  const [productsToShow, setProductsToShow] = useState(products);
+  const theresProducts = products.length > 0;
+
+  useEffect(() => {
+    setProductsToShow(products);
+  }, [products]);
+
+  const updateProductsToShow = (name: string) => {
+    setProductsToShow(products.filter(product => product.name.includes(name)));
+  };
 
   return (
     <>
@@ -17,27 +34,33 @@ export const Home: React.FC = () => {
           <TotalSpent />
         </Box>
         <Box w="100%" padding="5" maxW="500px" flex="1">
+          <Flex paddingBottom="8">
+            <FormControl w="100%" marginRight="8px">
+              <Input
+                isDisabled={!theresProducts}
+                placeholder="Buscar produtos"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  e && updateProductsToShow(e.target.value)
+                }
+              />
+            </FormControl>
+            <Button isDisabled={!theresProducts} variantColor="teal">
+              Buscar
+            </Button>
+          </Flex>
+
           <Flex
             justifyContent="space-between"
             alignItems="center"
             marginBottom="48px"
           >
             <Heading as="h2" size="md" marginBottom="0" marginRight="10px">
-              {products.length > 0
+              {theresProducts
                 ? "Compras cadastradas"
                 : "Você ainda não cadastrou compras."}
             </Heading>
-            <Button
-              onClick={() => {
-                history.push(Routes.CREATE_PRODUCT);
-              }}
-              variantColor="teal"
-              size="md"
-            >
-              Adicionar
-            </Button>
           </Flex>
-          {products
+          {productsToShow
             .filter(Boolean)
             .reverse()
             .map(product => {

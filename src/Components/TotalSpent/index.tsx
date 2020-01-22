@@ -1,9 +1,13 @@
 import React from "react";
-import { Box, Heading, Flex, Text } from "@chakra-ui/core";
+import { Box, Heading, Flex, Text, Button, IconButton } from "@chakra-ui/core";
 import { useProducts } from "../../Context/Products";
+import { useHistory } from "react-router-dom";
+import { Routes } from "../../Routes";
 
 export const TotalSpent: React.FC = () => {
   const { products } = useProducts();
+  const history = useHistory();
+
   const date = new Date();
   const month = date.getMonth();
   const year = date.getFullYear();
@@ -21,13 +25,23 @@ export const TotalSpent: React.FC = () => {
     }, 0);
 
   return (
-    <Flex w="100%" flexDirection="column">
-      <Box>
-        <Heading as="h1" fontSize="sm" marginBottom="32px">
-          Total gasto este mês:
-          <Text fontSize="40px">R${totalSpent.toFixed(2)}</Text>
-        </Heading>
-      </Box>
+    <Flex w="100%" alignItems="flex-end">
+      <Heading as="h1" fontSize="sm" marginRight="5">
+        Total gasto este mês:
+        <Text fontSize="40px">R${totalSpent.toFixed(2)}</Text>
+      </Heading>
+      <IconButton
+        onClick={() => {
+          history.push(Routes.CREATE_PRODUCT);
+        }}
+        variant="solid"
+        variantColor="teal"
+        aria-label="Call Sage"
+        fontSize="14px"
+        icon="add"
+        size="sm"
+        marginBottom="8px"
+      />
     </Flex>
   );
 };
