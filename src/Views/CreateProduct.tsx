@@ -49,7 +49,7 @@ export const CreateProduct: React.FC = () => {
   }
 
   return (
-    <form onSubmit={createProduct}>
+    <form onSubmit={createProduct} autoComplete="off">
       <Flex w="100%" maxW="500px" flexDirection="column" padding="5">
         <Heading as="h2" size="md" marginBottom="8">
           Adicionar nova compra

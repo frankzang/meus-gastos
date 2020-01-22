@@ -48,8 +48,8 @@ export const Home: React.FC = () => {
             {loading ? null : (
               <Heading as="h2" size="md" marginBottom="0" marginRight="10px">
                 {theresProducts
-                  ? "Compras cadastradas"
-                  : "Você ainda não cadastrou compras."}
+                  ? "Compras cadastradas."
+                  : "Você não tem compras cadastradas."}
               </Heading>
             )}
           </Flex>

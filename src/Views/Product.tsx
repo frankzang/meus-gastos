@@ -50,7 +50,7 @@ export const ProductPage: React.FC<Props> = props => {
           <Heading as="h2" size="md" marginBottom="8">
             {product.name}
           </Heading>
-          <Tag size="sm" variantColor="cyan" marginBottom="8px">
+          <Tag size="lg" variantColor="cyan" marginBottom="auto">
             R$ {product.price?.toFixed(2)}
           </Tag>
         </Flex>
@@ -64,7 +64,7 @@ export const ProductPage: React.FC<Props> = props => {
           await remove(product);
 
           toast({
-            title: `Compra removida.`,
+            title: `Item removido.`,
             description: `O item ${product.name} foi removido das compras salvas.`,
             status: "warning",
             duration: 5000,
@@ -76,6 +76,7 @@ export const ProductPage: React.FC<Props> = props => {
         variantColor="red"
         size="md"
         marginTop="8"
+        leftIcon="delete"
       >
         Remover
       </Button>
