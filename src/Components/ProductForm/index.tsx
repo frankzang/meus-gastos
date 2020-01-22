@@ -7,22 +7,43 @@ import {
   FormControl,
   FormHelperText,
   Flex,
-  useToast
+  useToast,
+  Heading
 } from "@chakra-ui/core";
 
 export const ProductForm: React.FC = () => {
   const { add } = useProductsActions();
-  const toast = useToast();
   const [name, setName] = React.useState("");
   const [price, setPrice] = React.useState("");
+  const buttonRef = React.useRef<HTMLButtonElement>();
+  const toast = useToast();
 
-  const updateName = (event: React.ChangeEvent<HTMLInputElement>) =>
+  React.useEffect(initEventListeners, []);
+
+  function initEventListeners() {
+    const button = buttonRef.current;
+    if (button) {
+      button.addEventListener("click", createProduct, {
+        once: true
+      });
+    }
+
+    return () => {
+      if (button) {
+        button.removeEventListener("click", createProduct);
+      }
+    };
+  }
+
+  function updateName(event: React.ChangeEvent<HTMLInputElement>) {
     setName(event.target.value);
-  const updatePrice = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setPrice(event.target.value);
+  }
 
-  async function createProduct(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function updatePrice(event: React.ChangeEvent<HTMLInputElement>) {
+    setPrice(event.target.value);
+  }
+
+  async function createProduct() {
     const time = new Date().getTime();
 
     await add({
@@ -33,7 +54,7 @@ export const ProductForm: React.FC = () => {
     });
 
     toast({
-      title: `${name} adicioado.`,
+      title: `Compra adicionada.`,
       description: `O item ${name} foi adicionado as compras salvas.`,
       status: "success",
       duration: 5000,
@@ -42,10 +63,14 @@ export const ProductForm: React.FC = () => {
 
     setName("");
     setPrice("");
+    initEventListeners();
   }
 
   return (
-    <form onSubmit={createProduct} autoComplete="off">
+    <Flex w="100%" maxW="500px" flexDirection="column" padding="5">
+      <Heading as="h2" size="md" marginBottom="8">
+        Adicionar nova compra
+      </Heading>
       <Flex direction="column">
         <FormControl marginBottom="8px">
           <FormLabel htmlFor="nome">Nome do produto</FormLabel>
@@ -75,10 +100,16 @@ export const ProductForm: React.FC = () => {
           />
         </FormControl>
         <FormHelperText>Escreva o valor em reais</FormHelperText>
-        <Button type="submit" variantColor="teal" size="md" marginTop="32px">
+        <Button
+          ref={buttonRef}
+          type="submit"
+          variantColor="teal"
+          size="md"
+          marginTop="32px"
+        >
           Criar
         </Button>
       </Flex>
-    </form>
+    </Flex>
   );
 };

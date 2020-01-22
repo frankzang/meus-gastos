@@ -57,7 +57,7 @@ const reducer = (state = initialState, action: Action): State => {
         products: state.products.filter(item => item.id !== action.product.id)
       };
     case "RESET":
-      return initialState;
+      return { ...initialState, loading: false };
     default:
       return state;
   }

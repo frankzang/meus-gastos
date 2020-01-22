@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Flex,
-  Heading,
-  Button,
-  Input,
-  FormControl,
-  CircularProgress
-} from "@chakra-ui/core";
+import { Box, Flex, Heading, CircularProgress } from "@chakra-ui/core";
 import { useProducts } from "../Context/Products";
 import { ProductCard } from "../Components/ProductCard";
 import { Link } from "react-router-dom";
 import { Routes } from "../Routes";
 import { TotalSpent } from "../Components/Status";
+import { SearchBox } from "../Components/SearchBox";
 
 export const Home: React.FC = () => {
   const { products, loading } = useProducts();
@@ -25,8 +18,9 @@ export const Home: React.FC = () => {
 
   const updateProductsToShow = (name: string) => {
     setProductsToShow(
-      products.filter(product =>
-        product.name.toLowerCase().includes(name.toLowerCase())
+      products.filter(
+        product =>
+          product && product.name.toLowerCase().includes(name.toLowerCase())
       )
     );
   };
@@ -38,35 +32,26 @@ export const Home: React.FC = () => {
           <TotalSpent />
         </Box>
         <Box w="100%" padding="5" maxW="500px" flex="1">
-          <Flex paddingBottom="8">
-            <FormControl w="100%" marginRight="8px">
-              <Input
-                isDisabled={!theresProducts}
-                placeholder="Buscar produtos"
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  e && updateProductsToShow(e.target.value)
-                }
-              />
-            </FormControl>
-          </Flex>
-
+          <SearchBox
+            isDisabled={!theresProducts}
+            onChange={e => updateProductsToShow(e.target.value)}
+          />
           <Flex
             justifyContent="space-between"
             alignItems="center"
             marginBottom="48px"
           >
-            <Heading as="h2" size="md" marginBottom="0" marginRight="10px">
-              {theresProducts
-                ? "Compras cadastradas"
-                : "Você ainda não cadastrou compras."}
-            </Heading>
+            {loading ? null : (
+              <Heading as="h2" size="md" marginBottom="0" marginRight="10px">
+                {theresProducts
+                  ? "Compras cadastradas"
+                  : "Você ainda não cadastrou compras."}
+              </Heading>
+            )}
           </Flex>
           {loading ? (
             <Flex justifyContent="center">
-              <CircularProgress
-                isIndeterminate
-                color="green"
-              ></CircularProgress>
+              <CircularProgress isIndeterminate color="green" />
             </Flex>
           ) : (
             productsToShow
