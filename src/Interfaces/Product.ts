@@ -3,5 +3,5 @@ export interface Product {
   name: string;
   description?: string;
   timestamp: number;
-  price?: number;
+  price: number;
 }

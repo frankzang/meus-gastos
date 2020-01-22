@@ -9,6 +9,7 @@ import {
 import { useProducts } from "../../Context/Products";
 import { useHistory } from "react-router-dom";
 import { Routes } from "../../Routes";
+import { currencyformatter } from "../../Utils/formatters";
 
 export const StatusHeader: React.FC = () => {
   const { products, loading } = useProducts();
@@ -40,7 +41,7 @@ export const StatusHeader: React.FC = () => {
         <>
           <Heading as="h1" fontSize="sm" marginRight="5">
             Total gasto este mês:
-            <Text fontSize="40px">R${totalSpent.toFixed(2)}</Text>
+            <Text fontSize="40px">{currencyformatter.format(totalSpent)}</Text>
           </Heading>
           <IconButton
             onClick={() => {

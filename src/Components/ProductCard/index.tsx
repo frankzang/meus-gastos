@@ -3,6 +3,7 @@ import { Box, Text, Tag, Flex } from "@chakra-ui/core";
 import { Product } from "../../Interfaces/Product";
 import { Link } from "react-router-dom";
 import { Routes } from "../../Routes";
+import { currencyformatter, dateformatter } from "../../Utils/formatters";
 
 interface Props {
   product: Product;
@@ -10,7 +11,6 @@ interface Props {
 
 export const ProductCard: React.FC<Props> = props => {
   const { product } = props;
-  const date = new Date(product.timestamp);
 
   return (
     <Link to={`${Routes.PRODUCT}/${product.id}`}>
@@ -26,11 +26,11 @@ export const ProductCard: React.FC<Props> = props => {
             {product.name}
           </Text>
           <Tag size="sm" variantColor="cyan" marginBottom="8px">
-            R$ {product.price?.toFixed(2)}
+            {currencyformatter.format(product.price)}
           </Tag>
         </Flex>
-        <Text fontSize="sm" isTruncated>
-          {date.toLocaleDateString()} às {date.getHours()}:{date.getMinutes()}
+        <Text fontSize="xs" isTruncated>
+          {dateformatter.format(product.timestamp)}
         </Text>
       </Box>
     </Link>

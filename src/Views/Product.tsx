@@ -11,6 +11,7 @@ import React from "react";
 import { RouteChildrenProps, Redirect, useHistory } from "react-router-dom";
 import { Routes } from "../Routes";
 import { useProducts, useProductsActions } from "../Context/Products";
+import { dateformatter } from "../Utils/formatters";
 
 interface RouteProps {
   productId: string;
@@ -41,8 +42,6 @@ export const ProductPage: React.FC<Props> = props => {
     return <Redirect to={Routes.HOME} />;
   }
 
-  const date = new Date(product.timestamp);
-
   return (
     <Flex
       w="100%"
@@ -62,8 +61,7 @@ export const ProductPage: React.FC<Props> = props => {
           </Tag>
         </Flex>
         <Text fontSize="sm" isTruncated>
-          Adicionado em {date.toLocaleDateString()} às {date.getHours()}:
-          {date.getMinutes()}
+          {dateformatter.format(product.timestamp)}
         </Text>
       </Flex>
       <Button
