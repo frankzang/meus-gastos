@@ -3,7 +3,7 @@ export const currencyformatter = new Intl.NumberFormat([], {
   currency: "BRL"
 });
 
-export let dateformatter = new Intl.DateTimeFormat("pt-BR", {
+export const dateformatter = new Intl.DateTimeFormat("pt-BR", {
   weekday: "short",
   month: "long",
   day: "2-digit",
