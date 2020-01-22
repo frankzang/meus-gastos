@@ -24,7 +24,11 @@ export const Home: React.FC = () => {
   }, [products]);
 
   const updateProductsToShow = (name: string) => {
-    setProductsToShow(products.filter(product => product.name.includes(name)));
+    setProductsToShow(
+      products.filter(product =>
+        product.name.toLowerCase().includes(name.toLowerCase())
+      )
+    );
   };
 
   return (
@@ -44,9 +48,6 @@ export const Home: React.FC = () => {
                 }
               />
             </FormControl>
-            <Button isDisabled={!theresProducts} variantColor="teal">
-              Buscar
-            </Button>
           </Flex>
 
           <Flex
