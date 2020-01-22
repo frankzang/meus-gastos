@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading, Flex, Text, Button, IconButton } from "@chakra-ui/core";
+import { Heading, Flex, Text, IconButton } from "@chakra-ui/core";
 import { useProducts } from "../../Context/Products";
 import { useHistory } from "react-router-dom";
 import { Routes } from "../../Routes";

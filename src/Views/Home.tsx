@@ -5,7 +5,6 @@ import {
   Heading,
   Button,
   Input,
-  FormHelperText,
   FormControl
 } from "@chakra-ui/core";
 import { useProducts } from "../Context/Products";
