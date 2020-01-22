@@ -49,45 +49,64 @@ export const CreateProduct: React.FC = () => {
   }
 
   return (
-    <form onSubmit={createProduct} autoComplete="off">
-      <Flex w="100%" maxW="500px" flexDirection="column" padding="5">
-        <Heading as="h2" size="md" marginBottom="8">
-          Adicionar nova compra
-        </Heading>
-        <Flex direction="column">
-          <FormControl marginBottom="8px">
-            <FormLabel htmlFor="nome">Nome do produto</FormLabel>
-            <Input
-              autoFocus
-              id="nome"
-              value={name}
-              onChange={updateName}
-              placeholder="ex. tomate"
+    <Flex
+      justifyContent="center"
+      w="100%"
+      padding="5"
+      maxW="500px"
+      margin="auto"
+    >
+      <form
+        onSubmit={createProduct}
+        autoComplete="off"
+        style={{
+          width: "100%"
+        }}
+      >
+        <Flex w="100%" flexDirection="column">
+          <Heading as="h2" size="md" marginBottom="8">
+            Adicionar nova compra
+          </Heading>
+          <Flex direction="column">
+            <FormControl marginBottom="8px">
+              <FormLabel htmlFor="nome">Nome do produto</FormLabel>
+              <Input
+                autoFocus
+                id="nome"
+                value={name}
+                onChange={updateName}
+                placeholder="ex. tomate"
+                size="md"
+                width="100%"
+                isRequired
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="valor">Valor</FormLabel>
+              <Input
+                id="valor"
+                value={price}
+                onChange={updatePrice}
+                placeholder="ex: 2,50"
+                type="number"
+                size="md"
+                width="100%"
+                variant="outline"
+                isRequired
+              />
+            </FormControl>
+            <FormHelperText>Escreva o valor em reais</FormHelperText>
+            <Button
+              type="submit"
+              variantColor="teal"
               size="md"
-              width="100%"
-              isRequired
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel htmlFor="valor">Valor</FormLabel>
-            <Input
-              id="valor"
-              value={price}
-              onChange={updatePrice}
-              placeholder="ex: 2,50"
-              type="number"
-              size="md"
-              width="100%"
-              variant="outline"
-              isRequired
-            />
-          </FormControl>
-          <FormHelperText>Escreva o valor em reais</FormHelperText>
-          <Button type="submit" variantColor="teal" size="md" marginTop="32px">
-            Criar
-          </Button>
+              marginTop="32px"
+            >
+              Criar
+            </Button>
+          </Flex>
         </Flex>
-      </Flex>
-    </form>
+      </form>
+    </Flex>
   );
 };

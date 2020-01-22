@@ -44,7 +44,14 @@ export const ProductPage: React.FC<Props> = props => {
   const date = new Date(product.timestamp);
 
   return (
-    <Flex w="100%" h="100%" padding="5" flexDir="column">
+    <Flex
+      w="100%"
+      h="100%"
+      padding="5"
+      flexDir="column"
+      maxW="500px"
+      margin="auto"
+    >
       <Flex flex="1" flexDir="column">
         <Flex w="100%" justifyContent="space-between">
           <Heading as="h2" size="md" marginBottom="8">

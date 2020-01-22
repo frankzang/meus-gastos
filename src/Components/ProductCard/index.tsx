@@ -15,7 +15,6 @@ export const ProductCard: React.FC<Props> = props => {
   return (
     <Link to={`${Routes.PRODUCT}/${product.id}`}>
       <Box
-        maxW="sm"
         borderWidth="1px"
         rounded="lg"
         overflow="hidden"
