@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Flex, Heading, CircularProgress } from "@chakra-ui/core";
 import { useProducts } from "../Context/Products";
 import { ProductCard } from "../Components/ProductCard";
-import { Link } from "react-router-dom";
-import { Routes } from "../Routes";
-import { TotalSpent } from "../Components/Status";
+import { StatusHeader } from "../Components/Status";
 import { SearchBox } from "../Components/SearchBox";
 
 export const Home: React.FC = () => {
@@ -27,9 +25,15 @@ export const Home: React.FC = () => {
 
   return (
     <>
-      <Flex w="100%" height="100%" alignItems="center" flexDirection="column">
+      <Flex
+        w="100%"
+        h="100%"
+        alignItems="center"
+        flexDirection="column"
+        paddingBottom="8"
+      >
         <Box w="100%" padding="5" maxW="500px">
-          <TotalSpent />
+          <StatusHeader />
         </Box>
         <Box w="100%" padding="5" maxW="500px" flex="1">
           <SearchBox
@@ -61,9 +65,6 @@ export const Home: React.FC = () => {
                 return <ProductCard key={product.id} product={product} />;
               })
           )}
-        </Box>
-        <Box padding="5">
-          <Link to={Routes.CONFIGURATIONS}>Configurações</Link>
         </Box>
       </Flex>
     </>

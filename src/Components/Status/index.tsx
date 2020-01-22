@@ -10,7 +10,7 @@ import { useProducts } from "../../Context/Products";
 import { useHistory } from "react-router-dom";
 import { Routes } from "../../Routes";
 
-export const TotalSpent: React.FC = () => {
+export const StatusHeader: React.FC = () => {
   const { products, loading } = useProducts();
   const history = useHistory();
 
@@ -54,6 +54,18 @@ export const TotalSpent: React.FC = () => {
             size="sm"
             marginBottom="10px"
           />
+          <IconButton
+            onClick={() => {
+              history.push(Routes.CONFIGURATIONS);
+            }}
+            icon="settings"
+            aria-label="configurações"
+            alignSelf="flex-end"
+            marginLeft="auto"
+            marginBottom="auto"
+            variant="link"
+            variantColor="gray"
+          ></IconButton>
         </>
       )}
     </Flex>
