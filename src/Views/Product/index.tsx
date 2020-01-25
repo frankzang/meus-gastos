@@ -1,18 +1,17 @@
 import {
+  CircularProgress,
   Flex,
   Heading,
-  Text,
-  Button,
+  Image,
   Tag,
-  useToast,
-  CircularProgress,
-  Image
+  Text
 } from "@chakra-ui/core";
 import React from "react";
-import { RouteChildrenProps, Redirect, useHistory } from "react-router-dom";
+import { Redirect, RouteChildrenProps } from "react-router-dom";
+import { DeleteProductPopup } from "../../Components/DeleteProdutPopup";
+import { useProducts } from "../../Context/Products";
 import { Routes } from "../../Routes";
-import { useProducts, useProductsActions } from "../../Context/Products";
-import { dateformatter, currencyformatter } from "../../Utils/formatters";
+import { currencyformatter, dateformatter } from "../../Utils/formatters";
 import styles from "./index.module.css";
 
 interface RouteProps {
@@ -23,9 +22,6 @@ interface Props extends RouteChildrenProps<RouteProps> {}
 
 export const ProductPage: React.FC<Props> = props => {
   const { products, loading } = useProducts();
-  const { remove } = useProductsActions();
-  const history = useHistory();
-  const toast = useToast();
   const productId = props.match?.params.productId || "0";
 
   const product = products.find(
@@ -75,27 +71,7 @@ export const ProductPage: React.FC<Props> = props => {
           {dateformatter.format(product.timestamp)}
         </Text>
       </Flex>
-      <Button
-        onClick={async () => {
-          await remove(product);
-
-          toast({
-            title: `Item removido.`,
-            description: `O item ${product.name} foi removido das compras salvas.`,
-            status: "warning",
-            duration: 3000,
-            isClosable: true
-          });
-
-          history.goBack();
-        }}
-        variantColor="red"
-        size="md"
-        marginTop="8"
-        leftIcon="delete"
-      >
-        Remover
-      </Button>
+      <DeleteProductPopup product={product} />
     </Flex>
   );
 };
