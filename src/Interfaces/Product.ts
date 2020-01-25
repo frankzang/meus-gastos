@@ -4,5 +4,5 @@ export interface Product {
   description?: string;
   timestamp: number;
   price: number;
-  image?: File;
+  image?: any;
 }

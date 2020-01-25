@@ -8,10 +8,12 @@ import {
   FormHelperText,
   Flex,
   useToast,
-  Heading
+  Heading,
+  Box
 } from "@chakra-ui/core";
 import ImageUploader from "react-images-upload";
 import styles from "./index.module.css";
+import { toBase64 } from "../../Utils/toBase64";
 
 export const CreateProduct: React.FC = () => {
   const { add } = useProductsActions();
@@ -32,12 +34,18 @@ export const CreateProduct: React.FC = () => {
     e.preventDefault();
     const time = new Date().getTime();
 
+    let base64Image: any = "";
+
+    if (image) {
+      base64Image = await toBase64(image);
+    }
+
     await add({
       id: time,
       timestamp: time,
       name,
       price: Number.parseFloat(price),
-      image
+      image: base64Image
     });
 
     toast({
@@ -60,6 +68,7 @@ export const CreateProduct: React.FC = () => {
     <Flex
       justifyContent="center"
       w="100%"
+      overflow="auto"
       padding="5"
       maxW="500px"
       margin="auto"
@@ -68,10 +77,11 @@ export const CreateProduct: React.FC = () => {
         onSubmit={createProduct}
         autoComplete="off"
         style={{
-          width: "100%"
+          width: "100%",
+          height: "100%"
         }}
       >
-        <Flex w="100%" flexDirection="column">
+        <Flex w="100%" flexDirection="column" flex="1">
           <Heading as="h2" size="md" marginBottom="8">
             Adicionar nova compra
           </Heading>
@@ -104,7 +114,9 @@ export const CreateProduct: React.FC = () => {
               />
               <FormHelperText>Escreva o valor em reais</FormHelperText>
             </FormControl>
-            <FormLabel htmlFor="file">Foto (opcional)</FormLabel>
+            <FormLabel htmlFor="file" mt="8px">
+              Foto (opcional)
+            </FormLabel>
             <ImageUploader
               withIcon={true}
               buttonText="Adicionar foto"
@@ -115,15 +127,18 @@ export const CreateProduct: React.FC = () => {
               withPreview
               className={styles["image-picker"]}
             />
+          </Flex>
+          <Box minH="50px" w="100%">
             <Button
               type="submit"
               variantColor="teal"
               size="md"
               marginTop="32px"
+              w="100%"
             >
-              Criar
+              Adicionar
             </Button>
-          </Flex>
+          </Box>
         </Flex>
       </form>
     </Flex>

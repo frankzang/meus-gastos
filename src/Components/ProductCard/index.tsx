@@ -13,11 +13,8 @@ interface Props {
 export const ProductCard: React.FC<Props> = props => {
   const { product } = props;
 
-  const imgSrc = product.image && URL.createObjectURL(product.image);
-
   return (
     <Link to={`${Routes.PRODUCT}/${product.id}`}>
-      <Flex></Flex>
       <Box
         borderWidth="1px"
         rounded="lg"
@@ -30,11 +27,11 @@ export const ProductCard: React.FC<Props> = props => {
           justifyItems="flex-start"
           alignItems="flex-start"
         >
-          {imgSrc && (
+          {product.image && (
             <Image
               rounded="10px"
               size="50px"
-              src={imgSrc}
+              src={product.image}
               alt="Segun Adebayo"
               marginRight="10px"
               marginBottom="10px"

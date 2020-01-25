@@ -44,8 +44,6 @@ export const ProductPage: React.FC<Props> = props => {
     return <Redirect to={Routes.HOME} />;
   }
 
-  const imgSrc = product.image && URL.createObjectURL(product.image);
-
   return (
     <Flex
       w="100%"
@@ -56,9 +54,9 @@ export const ProductPage: React.FC<Props> = props => {
       margin="auto"
     >
       <Flex flex="1" flexDir="column">
-        {imgSrc && (
+        {product.image && (
           <Image
-            src={imgSrc}
+            src={product.image}
             rounded="10px"
             marginBottom="5"
             maxH="200px"
