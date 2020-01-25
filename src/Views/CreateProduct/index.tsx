@@ -9,7 +9,8 @@ import {
   Flex,
   useToast,
   Heading,
-  Box
+  Box,
+  CircularProgress
 } from "@chakra-ui/core";
 import ImageUploader from "react-images-upload";
 import styles from "./index.module.css";
@@ -20,7 +21,9 @@ export const CreateProduct: React.FC = () => {
   const [name, setName] = React.useState("");
   const [price, setPrice] = React.useState("");
   const [image, setImage] = React.useState<File>();
+  const [isCreatingProduct, setIsCreatingProduct] = React.useState(false);
   const toast = useToast();
+  const imagePickerRef = React.useRef<ImageUploader>();
 
   function updateName(event: React.ChangeEvent<HTMLInputElement>) {
     setName(event.target.value);
@@ -32,6 +35,11 @@ export const CreateProduct: React.FC = () => {
 
   async function createProduct(e: React.ChangeEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    if (isCreatingProduct) return;
+
+    setIsCreatingProduct(true);
+
     const time = new Date().getTime();
 
     let base64Image: any = "";
@@ -58,6 +66,7 @@ export const CreateProduct: React.FC = () => {
 
     setName("");
     setPrice("");
+    setIsCreatingProduct(false);
   }
 
   function onDrop(files: File[]) {
@@ -68,6 +77,7 @@ export const CreateProduct: React.FC = () => {
     <Flex
       justifyContent="center"
       w="100%"
+      minH="100%"
       overflow="auto"
       padding="5"
       maxW="500px"
@@ -77,15 +87,19 @@ export const CreateProduct: React.FC = () => {
         onSubmit={createProduct}
         autoComplete="off"
         style={{
-          width: "100%",
-          height: "100%"
+          width: "100%"
         }}
       >
-        <Flex w="100%" flexDirection="column" flex="1">
-          <Heading as="h2" size="md" marginBottom="8">
-            Adicionar nova compra
-          </Heading>
-          <Flex direction="column">
+        <Flex
+          w="100%"
+          flexDirection="column"
+          justifyContent="space-between"
+          height="100%"
+        >
+          <Flex direction="column" height="100%">
+            <Heading as="h2" size="md" marginBottom="8">
+              Adicionar nova compra
+            </Heading>
             <FormControl marginBottom="8px">
               <FormLabel htmlFor="nome">Nome do produto</FormLabel>
               <Input
@@ -126,17 +140,35 @@ export const CreateProduct: React.FC = () => {
               singleImage
               withPreview
               className={styles["image-picker"]}
+              ref={imagePickerRef as any}
+              fileSizeError="o arquivo é grande demais"
+              maxFileSize={Infinity}
             />
           </Flex>
-          <Box minH="50px" w="100%">
+          <Box w="100%">
             <Button
+              isDisabled={isCreatingProduct}
               type="submit"
               variantColor="teal"
               size="md"
               marginTop="32px"
               w="100%"
+              leftIcon={
+                !isCreatingProduct
+                  ? "add"
+                  : () => {
+                      return (
+                        <CircularProgress
+                          isIndeterminate
+                          color="teal"
+                          size="20px"
+                          marginRight="10px"
+                        />
+                      );
+                    }
+              }
             >
-              Adicionar
+              {isCreatingProduct ? "Adicionando" : "Adicionar"}
             </Button>
           </Box>
         </Flex>
