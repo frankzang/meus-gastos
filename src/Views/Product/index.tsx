@@ -5,13 +5,15 @@ import {
   Button,
   Tag,
   useToast,
-  CircularProgress
+  CircularProgress,
+  Image
 } from "@chakra-ui/core";
 import React from "react";
 import { RouteChildrenProps, Redirect, useHistory } from "react-router-dom";
-import { Routes } from "../Routes";
-import { useProducts, useProductsActions } from "../Context/Products";
-import { dateformatter } from "../Utils/formatters";
+import { Routes } from "../../Routes";
+import { useProducts, useProductsActions } from "../../Context/Products";
+import { dateformatter, currencyformatter } from "../../Utils/formatters";
+import styles from "./index.module.css";
 
 interface RouteProps {
   productId: string;
@@ -42,6 +44,8 @@ export const ProductPage: React.FC<Props> = props => {
     return <Redirect to={Routes.HOME} />;
   }
 
+  const imgSrc = product.image && URL.createObjectURL(product.image);
+
   return (
     <Flex
       w="100%"
@@ -52,15 +56,24 @@ export const ProductPage: React.FC<Props> = props => {
       margin="auto"
     >
       <Flex flex="1" flexDir="column">
+        {imgSrc && (
+          <Image
+            src={imgSrc}
+            rounded="10px"
+            marginBottom="5"
+            maxH="200px"
+            objectFit="cover"
+          />
+        )}
         <Flex w="100%" justifyContent="space-between">
           <Heading as="h2" size="md" marginBottom="8">
             {product.name}
           </Heading>
           <Tag size="lg" variantColor="cyan" marginBottom="auto">
-            R$ {product.price?.toFixed(2)}
+            {currencyformatter.format(product.price)}
           </Tag>
         </Flex>
-        <Text fontSize="sm" isTruncated>
+        <Text className={styles.date} fontSize="sm" isTruncated>
           {dateformatter.format(product.timestamp)}
         </Text>
       </Flex>
@@ -72,7 +85,7 @@ export const ProductPage: React.FC<Props> = props => {
             title: `Item removido.`,
             description: `O item ${product.name} foi removido das compras salvas.`,
             status: "warning",
-            duration: 5000,
+            duration: 3000,
             isClosable: true
           });
 

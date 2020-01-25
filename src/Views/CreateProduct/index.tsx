@@ -1,5 +1,5 @@
 import React from "react";
-import { useProductsActions } from "../Context/Products";
+import { useProductsActions } from "../../Context/Products";
 import {
   Input,
   Button,
@@ -10,11 +10,14 @@ import {
   useToast,
   Heading
 } from "@chakra-ui/core";
+import ImageUploader from "react-images-upload";
+import styles from "./index.module.css";
 
 export const CreateProduct: React.FC = () => {
   const { add } = useProductsActions();
   const [name, setName] = React.useState("");
   const [price, setPrice] = React.useState("");
+  const [image, setImage] = React.useState<File>();
   const toast = useToast();
 
   function updateName(event: React.ChangeEvent<HTMLInputElement>) {
@@ -33,19 +36,24 @@ export const CreateProduct: React.FC = () => {
       id: time,
       timestamp: time,
       name,
-      price: Number.parseFloat(price)
+      price: Number.parseFloat(price),
+      image
     });
 
     toast({
       title: `Compra adicionada.`,
       description: `O item ${name} foi adicionado as compras salvas.`,
       status: "success",
-      duration: 5000,
+      duration: 3000,
       isClosable: true
     });
 
     setName("");
     setPrice("");
+  }
+
+  function onDrop(files: File[]) {
+    setImage(files[0]);
   }
 
   return (
@@ -94,8 +102,19 @@ export const CreateProduct: React.FC = () => {
                 variant="outline"
                 isRequired
               />
+              <FormHelperText>Escreva o valor em reais</FormHelperText>
             </FormControl>
-            <FormHelperText>Escreva o valor em reais</FormHelperText>
+            <FormLabel htmlFor="file">Foto (opcional)</FormLabel>
+            <ImageUploader
+              withIcon={true}
+              buttonText="Adicionar foto"
+              onChange={onDrop}
+              imgExtension={[".jpg", ".png"]}
+              label=""
+              singleImage
+              withPreview
+              className={styles["image-picker"]}
+            />
             <Button
               type="submit"
               variantColor="teal"

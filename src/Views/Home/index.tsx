@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Box, Flex, Heading, CircularProgress } from "@chakra-ui/core";
-import { useProducts } from "../Context/Products";
-import { ProductCard } from "../Components/ProductCard";
-import { StatusHeader } from "../Components/Status";
-import { SearchBox } from "../Components/SearchBox";
+import { useProducts } from "../../Context/Products";
+import { ProductCard } from "../../Components/ProductCard";
+import { StatusHeader } from "../../Components/Status";
+import { SearchBox } from "../../Components/SearchBox";
 
 export const Home: React.FC = () => {
   const { products, loading } = useProducts();

@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Flex, Heading, Button } from "@chakra-ui/core";
-import { useProductsActions } from "../Context/Products";
+import { useProductsActions } from "../../Context/Products";
 
 export const Configurations: React.FC = () => {
   const { eraseData } = useProductsActions();
