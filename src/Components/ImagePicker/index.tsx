@@ -1,16 +1,24 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styles from "./index.module.css";
 import { Button, useColorMode } from "@chakra-ui/core";
 
 interface Props {
   onChange: (file: File | undefined) => void;
+  dispose?: Boolean;
 }
 
 export const ImagePicker: React.FC<Props> = props => {
   const [image, setImage] = React.useState<string>();
   const { colorMode } = useColorMode();
+  const { onChange, dispose: resetImage } = props;
 
-  useEffect(() => {
+  React.useEffect(() => {
+    if (resetImage && image) {
+      setImage("");
+    }
+  }, [resetImage, image]);
+
+  React.useEffect(() => {
     return () => {
       if (image) {
         URL.revokeObjectURL(image);
@@ -25,7 +33,7 @@ export const ImagePicker: React.FC<Props> = props => {
       const file = files[0];
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
-      props.onChange(file);
+      onChange(file);
     }
   }
 
@@ -37,9 +45,9 @@ export const ImagePicker: React.FC<Props> = props => {
     }
   }
 
-  function resetImage() {
+  function removeImage() {
     setImage("");
-    props.onChange(undefined);
+    onChange(undefined);
   }
 
   return (
@@ -51,7 +59,7 @@ export const ImagePicker: React.FC<Props> = props => {
         className={styles.image}
       />
       <Button
-        onClick={image ? resetImage : triggerImagePicker}
+        onClick={image ? removeImage : triggerImagePicker}
         color={colorMode === "light" ? "gray.800" : "white"}
         variant="solid"
       >

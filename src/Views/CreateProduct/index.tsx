@@ -21,6 +21,7 @@ export const CreateProduct: React.FC = () => {
   const [name, setName] = React.useState("");
   const [price, setPrice] = React.useState("");
   const [image, setImage] = React.useState<File>();
+  const [resetImage, setResetImage] = React.useState<Boolean>(false);
   const [isCreatingProduct, setIsCreatingProduct] = React.useState(false);
   const toast = useToast();
 
@@ -66,6 +67,7 @@ export const CreateProduct: React.FC = () => {
     setName("");
     setPrice("");
     setIsCreatingProduct(false);
+    setResetImage(true);
   }
 
   return (
@@ -126,20 +128,13 @@ export const CreateProduct: React.FC = () => {
             <CustomFormLabel htmlFor="file" mt="8px">
               Foto (opcional)
             </CustomFormLabel>
-            <ImagePicker onChange={file => setImage(file)} />
-            {/* <ImageUploader
-              withIcon={true}
-              buttonText="Adicionar foto"
-              onChange={onDrop}
-              imgExtension={[".jpg", ".png"]}
-              label=""
-              singleImage
-              withPreview
-              className={styles["image-picker"]}
-              ref={imagePickerRef as any}
-              fileSizeError="o arquivo é grande demais"
-              maxFileSize={Infinity}
-            /> */}
+            <ImagePicker
+              onChange={file => {
+                setResetImage(false);
+                setImage(file);
+              }}
+              dispose={resetImage}
+            />
           </Flex>
           <Box w="100%">
             <Button
