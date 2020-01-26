@@ -1,15 +1,10 @@
 import React from "react";
-import {
-  Heading,
-  Flex,
-  Text,
-  IconButton,
-  CircularProgress
-} from "@chakra-ui/core";
+import { Flex, Text, IconButton, CircularProgress } from "@chakra-ui/core";
 import { useProducts } from "../../Context/Products";
 import { useHistory } from "react-router-dom";
 import { Routes } from "../../Routes";
 import { currencyformatter } from "../../Utils/formatters";
+import { CustomHeading } from "../Headings";
 
 export const StatusHeader: React.FC = () => {
   const { products, loading } = useProducts();
@@ -39,10 +34,10 @@ export const StatusHeader: React.FC = () => {
         </Flex>
       ) : (
         <>
-          <Heading as="h1" fontSize="sm" marginRight="5">
+          <CustomHeading fontSize="sm" marginRight="5">
             Total gasto este mês:
             <Text fontSize="40px">{currencyformatter.format(totalSpent)}</Text>
-          </Heading>
+          </CustomHeading>
           <IconButton
             onClick={() => {
               history.push(Routes.CREATE_PRODUCT);

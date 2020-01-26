@@ -6,7 +6,8 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
-  useToast
+  useToast,
+  useColorMode
 } from "@chakra-ui/core";
 import React from "react";
 import { useProductsActions } from "../../Context/Products";
@@ -18,11 +19,14 @@ interface Props {
 
 export const DeleteProductPopup: React.FC<Props> = props => {
   const [isOpen, setIsOpen] = React.useState();
-  const onClose = () => setIsOpen(false);
   const cancelRef = React.useRef();
   const toast = useToast();
   const { remove } = useProductsActions();
+  const { colorMode } = useColorMode();
   const { product } = props;
+  const color = { light: "gray.800", dark: "white" };
+
+  const onClose = () => setIsOpen(false);
 
   return (
     <>
@@ -45,17 +49,21 @@ export const DeleteProductPopup: React.FC<Props> = props => {
       >
         <AlertDialogOverlay />
         <AlertDialogContent>
-          <AlertDialogHeader fontSize="lg" fontWeight="bold">
+          <AlertDialogHeader
+            fontSize="lg"
+            fontWeight="bold"
+            color={color[colorMode]}
+          >
             Remover compra?
           </AlertDialogHeader>
 
-          <AlertDialogBody>
+          <AlertDialogBody color={color[colorMode]}>
             <p>Você tem certeza que deseja remover este item?</p>
             <p>Essa ação não poderá ser desfeita.</p>
           </AlertDialogBody>
 
           <AlertDialogFooter>
-            <Button ref={cancelRef} onClick={onClose}>
+            <Button ref={cancelRef} onClick={onClose} color={color[colorMode]}>
               Cancelar
             </Button>
             <Button

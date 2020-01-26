@@ -1,10 +1,12 @@
 import React from "react";
-import { Box, Text, Tag, Flex, Image } from "@chakra-ui/core";
+import { Box, Tag, Flex, Image } from "@chakra-ui/core";
 import { Product } from "../../Interfaces/Product";
 import { Link } from "react-router-dom";
 import { Routes } from "../../Routes";
 import { currencyformatter, dateformatter } from "../../Utils/formatters";
 import styles from "./index.module.css";
+import { CustomHeading } from "../Headings";
+import { CustomText } from "../CustomText";
 
 interface Props {
   product: Product;
@@ -37,16 +39,16 @@ export const ProductCard: React.FC<Props> = props => {
               marginBottom="10px"
             />
           )}
-          <Text fontSize="x1" isTruncated flex="1">
+          <CustomHeading as="h3" fontSize="x1" isTruncated flex="1">
             {product.name}
-          </Text>
+          </CustomHeading>
           <Tag size="sm" variantColor="cyan" marginBottom="8px">
             {currencyformatter.format(product.price)}
           </Tag>
         </Flex>
-        <Text fontSize="xs" isTruncated className={styles.date}>
+        <CustomText fontSize="xs" isTruncated className={styles.date}>
           {dateformatter.format(product.timestamp)}
-        </Text>
+        </CustomText>
       </Box>
     </Link>
   );

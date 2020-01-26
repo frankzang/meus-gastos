@@ -1,20 +1,20 @@
 import React from "react";
 import { useProductsActions } from "../../Context/Products";
 import {
-  Input,
   Button,
   FormLabel,
   FormControl,
   FormHelperText,
   Flex,
   useToast,
-  Heading,
   Box,
   CircularProgress
 } from "@chakra-ui/core";
-import ImageUploader from "react-images-upload";
-import styles from "./index.module.css";
 import { toBase64 } from "../../Utils/toBase64";
+import { CustomInput } from "../../Components/CustomInput";
+import { CustomFormLabel } from "../../Components/CustomFormLabel";
+import { CustomHeading } from "../../Components/Headings";
+import { ImagePicker } from "../../Components/ImagePicker";
 
 export const CreateProduct: React.FC = () => {
   const { add } = useProductsActions();
@@ -23,7 +23,6 @@ export const CreateProduct: React.FC = () => {
   const [image, setImage] = React.useState<File>();
   const [isCreatingProduct, setIsCreatingProduct] = React.useState(false);
   const toast = useToast();
-  const imagePickerRef = React.useRef<ImageUploader>();
 
   function updateName(event: React.ChangeEvent<HTMLInputElement>) {
     setName(event.target.value);
@@ -69,10 +68,6 @@ export const CreateProduct: React.FC = () => {
     setIsCreatingProduct(false);
   }
 
-  function onDrop(files: File[]) {
-    setImage(files[0]);
-  }
-
   return (
     <Flex
       justifyContent="center"
@@ -97,12 +92,12 @@ export const CreateProduct: React.FC = () => {
           height="100%"
         >
           <Flex direction="column" height="100%">
-            <Heading as="h2" size="md" marginBottom="8">
+            <CustomHeading as="h2" size="md" marginBottom="8">
               Adicionar nova compra
-            </Heading>
+            </CustomHeading>
             <FormControl marginBottom="8px">
-              <FormLabel htmlFor="nome">Nome do produto</FormLabel>
-              <Input
+              <CustomFormLabel htmlFor="nome">Nome do produto</CustomFormLabel>
+              <CustomInput
                 autoFocus
                 id="nome"
                 value={name}
@@ -115,7 +110,7 @@ export const CreateProduct: React.FC = () => {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="valor">Valor</FormLabel>
-              <Input
+              <CustomInput
                 id="valor"
                 value={price}
                 onChange={updatePrice}
@@ -128,10 +123,11 @@ export const CreateProduct: React.FC = () => {
               />
               <FormHelperText>Escreva o valor em reais</FormHelperText>
             </FormControl>
-            <FormLabel htmlFor="file" mt="8px">
+            <CustomFormLabel htmlFor="file" mt="8px">
               Foto (opcional)
-            </FormLabel>
-            <ImageUploader
+            </CustomFormLabel>
+            <ImagePicker onChange={file => setImage(file)} />
+            {/* <ImageUploader
               withIcon={true}
               buttonText="Adicionar foto"
               onChange={onDrop}
@@ -143,7 +139,7 @@ export const CreateProduct: React.FC = () => {
               ref={imagePickerRef as any}
               fileSizeError="o arquivo é grande demais"
               maxFileSize={Infinity}
-            />
+            /> */}
           </Flex>
           <Box w="100%">
             <Button

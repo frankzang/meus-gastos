@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Box, Flex, Heading, CircularProgress } from "@chakra-ui/core";
+import { Box, Flex, CircularProgress } from "@chakra-ui/core";
 import { useProducts } from "../../Context/Products";
 import { ProductCard } from "../../Components/ProductCard";
 import { StatusHeader } from "../../Components/Status";
 import { SearchBox } from "../../Components/SearchBox";
+import { CustomHeading } from "../../Components/Headings";
 
 export const Home: React.FC = () => {
   const { products, loading } = useProducts();
@@ -46,11 +47,16 @@ export const Home: React.FC = () => {
             marginBottom="48px"
           >
             {loading ? null : (
-              <Heading as="h2" size="md" marginBottom="0" marginRight="10px">
+              <CustomHeading
+                as="h2"
+                size="md"
+                marginBottom="0"
+                marginRight="10px"
+              >
                 {theresProducts
                   ? "Compras cadastradas."
-                  : "Você não tem compras cadastradas."}
-              </Heading>
+                  : "Você não possui compras cadastradas."}
+              </CustomHeading>
             )}
           </Flex>
           {loading ? (

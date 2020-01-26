@@ -1,0 +1,20 @@
+.container {
+  width: 100%;
+  position: relative;
+  min-height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.input {
+  transform: scale(0);
+}
+
+.image {
+  width: 100%;
+  border-radius: 9px;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}

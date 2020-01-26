@@ -1,11 +1,4 @@
-import {
-  CircularProgress,
-  Flex,
-  Heading,
-  Image,
-  Tag,
-  Text
-} from "@chakra-ui/core";
+import { CircularProgress, Flex, Image, Tag } from "@chakra-ui/core";
 import React from "react";
 import { Redirect, RouteChildrenProps } from "react-router-dom";
 import { DeleteProductPopup } from "../../Components/DeleteProdutPopup";
@@ -13,6 +6,8 @@ import { useProducts } from "../../Context/Products";
 import { Routes } from "../../Routes";
 import { currencyformatter, dateformatter } from "../../Utils/formatters";
 import styles from "./index.module.css";
+import { CustomHeading } from "../../Components/Headings";
+import { CustomText } from "../../Components/CustomText";
 
 interface RouteProps {
   productId: string;
@@ -60,16 +55,16 @@ export const ProductPage: React.FC<Props> = props => {
           />
         )}
         <Flex w="100%" justifyContent="space-between">
-          <Heading as="h2" size="md" marginBottom="8">
+          <CustomHeading as="h2" size="md" marginBottom="8">
             {product.name}
-          </Heading>
+          </CustomHeading>
           <Tag size="lg" variantColor="cyan" marginBottom="auto">
             {currencyformatter.format(product.price)}
           </Tag>
         </Flex>
-        <Text className={styles.date} fontSize="sm" isTruncated>
+        <CustomText className={styles.date} fontSize="sm" isTruncated>
           {dateformatter.format(product.timestamp)}
-        </Text>
+        </CustomText>
       </Flex>
       <DeleteProductPopup product={product} />
     </Flex>
