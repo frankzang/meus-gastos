@@ -62,6 +62,7 @@ export const ImagePicker: React.FC<Props> = props => {
         onClick={image ? removeImage : triggerImagePicker}
         color={colorMode === "light" ? "gray.800" : "white"}
         variant="solid"
+        leftIcon="plus-square"
       >
         {image ? "Remover" : "Selecionar imagem"}
       </Button>
