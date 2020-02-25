@@ -7,7 +7,10 @@ import { SearchBox } from "../../Components/SearchBox";
 import { CustomHeading } from "../../Components/Headings";
 
 export const Home: React.FC = () => {
-  const { products, loading } = useProducts();
+  const state = useProducts();
+  const {
+    context: { products }
+  } = state;
   const [productsToShow, setProductsToShow] = useState(products);
   const theresProducts = products.length > 0;
 
@@ -46,7 +49,7 @@ export const Home: React.FC = () => {
             alignItems="center"
             marginBottom="48px"
           >
-            {loading ? null : (
+            {state.matches("fetching") ? null : (
               <CustomHeading
                 as="h2"
                 size="md"
@@ -59,7 +62,7 @@ export const Home: React.FC = () => {
               </CustomHeading>
             )}
           </Flex>
-          {loading ? (
+          {state.matches("fetching") ? (
             <Flex justifyContent="center">
               <CircularProgress isIndeterminate color="green" />
             </Flex>

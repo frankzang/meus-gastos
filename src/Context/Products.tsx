@@ -1,95 +1,36 @@
 import React from "react";
 import { get, set, del, keys, clear } from "idb-keyval";
 import { Product } from "../Interfaces/Product";
+import { useMachine } from "@xstate/react";
+import { productsMachine, ProductState, ProductEvent } from "./productsMachine";
 
-interface AddProduct {
-  type: "ADD";
-  product: Product;
-}
-
-interface SetProducts {
-  type: "SET_PRODUCTS";
-  products: Product[];
-}
-
-interface RemoveProduct {
-  type: "REMOVE";
-  product: Product;
-}
-
-interface ResetProducts {
-  type: "RESET";
-}
-
-interface LoadingProducts {
-  type: "LOADING";
-  loading: boolean;
-}
-
-type Action =
-  | SetProducts
-  | AddProduct
-  | RemoveProduct
-  | ResetProducts
-  | LoadingProducts;
-
-interface State {
-  products: Product[];
-  loading: boolean;
-}
-
-const initialState: State = {
-  products: [],
-  loading: true
-};
-
-const reducer = (state = initialState, action: Action): State => {
-  switch (action.type) {
-    case "SET_PRODUCTS":
-      return { ...state, products: action.products, loading: false };
-    case "LOADING":
-      return { ...state, loading: action.loading };
-    case "ADD":
-      return { ...state, products: [...state.products, action.product] };
-    case "REMOVE":
-      return {
-        ...state,
-        products: state.products.filter(item => item.id !== action.product.id)
-      };
-    case "RESET":
-      return { ...initialState, loading: false };
-    default:
-      return state;
-  }
-};
-
-const stateContext = React.createContext<State | undefined>(undefined);
-const dispatchContext = React.createContext<React.Dispatch<Action> | undefined>(
-  undefined
-);
+const stateContext = React.createContext<ProductState | undefined>(undefined);
+const dispatchContext = React.createContext<
+  React.Dispatch<ProductEvent> | undefined
+>(undefined);
 
 export const ProductsProvider: React.FC = props => {
-  const [state, dispatch] = React.useReducer(reducer, initialState);
+  const [state, send] = useMachine(productsMachine);
 
-  React.useEffect(() => {
-    getLocalProducts();
-  }, []);
-
-  async function getLocalProducts() {
+  const getLocalProducts = React.useCallback(async () => {
     const allProductsIds = await keys();
     const products = await Promise.all<Product>(
       allProductsIds.map(id => get(id))
     );
 
-    dispatch({
+    send({
       type: "SET_PRODUCTS",
       products
     });
-  }
+  }, [send]);
+
+  React.useEffect(() => {
+    getLocalProducts();
+  }, [state, getLocalProducts]);
 
   return (
     <stateContext.Provider value={state}>
-      <dispatchContext.Provider value={dispatch}>
+      <dispatchContext.Provider value={send}>
         {props.children}
       </dispatchContext.Provider>
     </stateContext.Provider>
@@ -108,9 +49,9 @@ export const useProducts = () => {
 };
 
 export const useProductsActions = () => {
-  const dispatch = React.useContext(dispatchContext);
+  const send = React.useContext(dispatchContext);
 
-  if (!dispatch)
+  if (!send)
     throw new Error(
       "useProductsActions must be used inside a ProductsProvider context"
     );
@@ -118,7 +59,7 @@ export const useProductsActions = () => {
   const add = async (product: Product) => {
     await set(product.id, product);
 
-    dispatch({
+    send({
       type: "ADD",
       product
     });
@@ -129,7 +70,7 @@ export const useProductsActions = () => {
   const remove = async (product: Product) => {
     await del(product.id);
 
-    dispatch({
+    send({
       type: "REMOVE",
       product
     });
@@ -138,7 +79,7 @@ export const useProductsActions = () => {
   const eraseData = async () => {
     await clear();
 
-    dispatch({
+    send({
       type: "RESET"
     });
   };

@@ -15,59 +15,128 @@ import { CustomInput } from "../../Components/CustomInput";
 import { CustomFormLabel } from "../../Components/CustomFormLabel";
 import { CustomHeading } from "../../Components/Headings";
 import { ImagePicker } from "../../Components/ImagePicker";
+import { Machine, assign } from "xstate";
+import { Product } from "../../Interfaces/Product";
+import { useMachine } from "@xstate/react";
+
+interface Context {
+  product: Partial<Product>;
+}
+
+interface Schema {
+  states: {
+    idle: {};
+    saving: {};
+    saved: {};
+  };
+}
+
+type Actions =
+  | { type: "CHANGE"; data: Partial<Product> }
+  | { type: "SAVE" }
+  | { type: "RESET" }
+  | { type: "SAVED" };
+
+const initialProduct: Partial<Product> = {
+  id: 0,
+  name: "",
+  price: 0
+};
+
+const productMachine = Machine<Context, Schema, Actions>({
+  id: "products",
+  initial: "idle",
+  context: {
+    product: { ...initialProduct }
+  },
+  states: {
+    idle: {
+      on: {
+        SAVE: {
+          target: "saving",
+          cond: ctx => !!(ctx.product.name && ctx.product.price)
+        },
+        CHANGE: {
+          actions: assign({
+            product: (_ctx, evt) => evt.data
+          })
+        }
+      }
+    },
+    saving: {
+      on: {
+        SAVED: "saved"
+      }
+    },
+    saved: {
+      on: {
+        RESET: {
+          target: "idle",
+          actions: assign({
+            product: _ctx => {
+              return initialProduct;
+            }
+          })
+        }
+      }
+    }
+  }
+});
 
 export const CreateProduct: React.FC = () => {
+  const [current, send] = useMachine(productMachine);
   const { add } = useProductsActions();
-  const [name, setName] = React.useState("");
-  const [price, setPrice] = React.useState("");
-  const [image, setImage] = React.useState<File>();
-  const [resetImage, setResetImage] = React.useState<Boolean>(false);
-  const [isCreatingProduct, setIsCreatingProduct] = React.useState(false);
   const toast = useToast();
 
-  function updateName(event: React.ChangeEvent<HTMLInputElement>) {
-    setName(event.target.value);
+  const {
+    context: { product }
+  } = current;
+
+  React.useEffect(() => {
+    if (current.matches("saved")) {
+      toast({
+        title: `Compra adicionada.`,
+        description: `O item ${product?.name} foi adicionado as compras salvas.`,
+        status: "success",
+        duration: 3000,
+        isClosable: true
+      });
+      send("RESET");
+    }
+  });
+
+  function updateField(name: keyof typeof initialProduct, value: any) {
+    send({
+      type: "CHANGE",
+      data: { ...product, [name]: value }
+    });
   }
 
-  function updatePrice(event: React.ChangeEvent<HTMLInputElement>) {
-    setPrice(event.target.value);
-  }
-
-  async function createProduct(e: React.ChangeEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    if (isCreatingProduct) return;
-
-    setIsCreatingProduct(true);
-
-    const time = new Date().getTime();
-
+  async function updateImage(image?: File) {
     let base64Image: any = "";
 
     if (image) {
       base64Image = await toBase64(image);
     }
 
+    updateField("image", base64Image);
+  }
+
+  async function createProduct(e: React.ChangeEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (current.matches("saving")) return;
+
+    send("SAVE");
+
+    const now = new Date().getTime();
+
     await add({
-      id: time,
-      timestamp: time,
-      name,
-      price: Number.parseFloat(price),
-      image: base64Image
+      ...(product as Product),
+      id: now,
+      timestamp: now
     });
 
-    toast({
-      title: `Compra adicionada.`,
-      description: `O item ${name} foi adicionado as compras salvas.`,
-      status: "success",
-      duration: 3000,
-      isClosable: true
-    });
-
-    setName("");
-    setPrice("");
-    setIsCreatingProduct(false);
-    setResetImage(true);
+    send("SAVED");
   }
 
   return (
@@ -102,8 +171,10 @@ export const CreateProduct: React.FC = () => {
               <CustomInput
                 autoFocus
                 id="nome"
-                value={name}
-                onChange={updateName}
+                value={product?.name ?? ""}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  updateField("name", e.currentTarget.value)
+                }
                 placeholder="ex. tomate"
                 size="md"
                 width="100%"
@@ -114,8 +185,10 @@ export const CreateProduct: React.FC = () => {
               <FormLabel htmlFor="valor">Valor</FormLabel>
               <CustomInput
                 id="valor"
-                value={price}
-                onChange={updatePrice}
+                value={product?.price ?? ""}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  updateField("price", +e.currentTarget.value)
+                }
                 placeholder="ex: 2,50"
                 type="number"
                 size="md"
@@ -129,37 +202,32 @@ export const CreateProduct: React.FC = () => {
               Foto (opcional)
             </CustomFormLabel>
             <ImagePicker
-              onChange={file => {
-                setResetImage(false);
-                setImage(file);
-              }}
-              dispose={resetImage}
+              onChange={updateImage}
+              dispose={current.matches("saved")}
             />
           </Flex>
           <Box w="100%">
             <Button
-              isDisabled={isCreatingProduct}
+              isDisabled={current.matches("saving")}
               type="submit"
               variantColor="teal"
               size="md"
               marginTop="32px"
               w="100%"
               leftIcon={
-                !isCreatingProduct
+                !current.matches("saving")
                   ? "add"
-                  : () => {
-                      return (
-                        <CircularProgress
-                          isIndeterminate
-                          color="teal"
-                          size="20px"
-                          marginRight="10px"
-                        />
-                      );
-                    }
+                  : () => (
+                      <CircularProgress
+                        isIndeterminate
+                        color="teal"
+                        size="20px"
+                        marginRight="10px"
+                      />
+                    )
               }
             >
-              {isCreatingProduct ? "Adicionando" : "Adicionar"}
+              {!current.matches("saving") ? "Adicionar" : "Adicionando"}
             </Button>
           </Box>
         </Flex>

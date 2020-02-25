@@ -7,7 +7,10 @@ import { currencyformatter } from "../../Utils/formatters";
 import { CustomHeading } from "../Headings";
 
 export const StatusHeader: React.FC = () => {
-  const { products, loading } = useProducts();
+  const state = useProducts();
+  const {
+    context: { products }
+  } = state;
   const history = useHistory();
 
   const date = new Date();
@@ -28,7 +31,7 @@ export const StatusHeader: React.FC = () => {
 
   return (
     <Flex w="100%" alignItems="flex-end">
-      {loading ? (
+      {state.matches("fetching") ? (
         <Flex justifyContent="center">
           <CircularProgress isIndeterminate color="green"></CircularProgress>
         </Flex>

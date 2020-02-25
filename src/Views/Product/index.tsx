@@ -16,14 +16,17 @@ interface RouteProps {
 interface Props extends RouteChildrenProps<RouteProps> {}
 
 export const ProductPage: React.FC<Props> = props => {
-  const { products, loading } = useProducts();
+  const state = useProducts();
+  const {
+    context: { products }
+  } = state;
   const productId = props.match?.params.productId || "0";
 
   const product = products.find(
     product => product.id === Number.parseInt(productId)
   );
 
-  if (loading) {
+  if (state.matches("fetching")) {
     return (
       <Flex justifyContent="center" padding="8">
         <CircularProgress isIndeterminate color="green" />

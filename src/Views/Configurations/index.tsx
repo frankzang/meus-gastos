@@ -5,7 +5,7 @@ import { ColorModeButton } from "../../Components/ColorModeButton";
 
 export const Configurations: React.FC = () => {
   const { eraseData } = useProductsActions();
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { colorMode } = useColorMode();
 
   return (
     <Flex
