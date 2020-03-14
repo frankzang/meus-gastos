@@ -1,5 +1,5 @@
 import React from "react";
-import { get, set, del, keys, clear } from "idb-keyval";
+import { set, del, clear } from "idb-keyval";
 import { Product } from "../Interfaces/Product";
 import { useMachine } from "@xstate/react";
 import { productsMachine, ProductState, ProductEvent } from "./productsMachine";
@@ -11,22 +11,6 @@ const dispatchContext = React.createContext<
 
 export const ProductsProvider: React.FC = props => {
   const [state, send] = useMachine(productsMachine);
-
-  const getLocalProducts = React.useCallback(async () => {
-    const allProductsIds = await keys();
-    const products = await Promise.all<Product>(
-      allProductsIds.map(id => get(id))
-    );
-
-    send({
-      type: "SET_PRODUCTS",
-      products
-    });
-  }, [send]);
-
-  React.useEffect(() => {
-    getLocalProducts();
-  }, [state, getLocalProducts]);
 
   return (
     <stateContext.Provider value={state}>
