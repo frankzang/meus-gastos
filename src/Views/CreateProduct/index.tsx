@@ -1,14 +1,13 @@
 import React from "react";
-import { useProductsActions } from "../../Context/Products";
+import { useProductsEvents, useProducts } from "../../Context/Products";
 import {
   Button,
-  FormLabel,
   FormControl,
   FormHelperText,
   Flex,
-  useToast,
   Box,
-  CircularProgress
+  CircularProgress,
+  useToast,
 } from "@chakra-ui/core";
 import { toBase64 } from "../../Utils/toBase64";
 import { CustomInput } from "../../Components/CustomInput";
@@ -26,89 +25,67 @@ interface Context {
 interface Schema {
   states: {
     idle: {};
-    saving: {};
-    saved: {};
   };
 }
 
-type Actions =
-  | { type: "CHANGE"; data: Partial<Product> }
-  | { type: "SAVE" }
-  | { type: "RESET" }
-  | { type: "SAVED" };
+type Actions = { type: "CHANGE"; data: Partial<Product> } | { type: "RESET" };
 
 const initialProduct: Partial<Product> = {
   id: 0,
-  name: "",
-  price: 0
 };
 
 const productMachine = Machine<Context, Schema, Actions>({
   id: "products",
   initial: "idle",
   context: {
-    product: { ...initialProduct }
+    product: { ...initialProduct },
   },
   states: {
     idle: {
       on: {
-        SAVE: {
-          target: "saving",
-          cond: ctx => !!(ctx.product.name && ctx.product.price)
-        },
         CHANGE: {
           actions: assign({
-            product: (_ctx, evt) => evt.data
-          })
-        }
-      }
-    },
-    saving: {
-      on: {
-        SAVED: "saved"
-      }
-    },
-    saved: {
-      on: {
+            product: (_ctx, evt) => evt.data,
+          }),
+        },
         RESET: {
-          target: "idle",
           actions: assign({
             product: _ctx => {
               return initialProduct;
-            }
-          })
-        }
-      }
-    }
-  }
+            },
+          }),
+        },
+      },
+    },
+  },
 });
 
 export const CreateProduct: React.FC = () => {
   const [current, send] = useMachine(productMachine);
-  const { add } = useProductsActions();
+  const state = useProducts();
+  const sendProductEvent = useProductsEvents();
   const toast = useToast();
 
-  const {
-    context: { product }
-  } = current;
-
   React.useEffect(() => {
-    if (current.matches("saved")) {
+    if (state.matches("created")) {
       toast({
         title: `Compra adicionada.`,
         description: `O item ${product?.name} foi adicionado as compras salvas.`,
         status: "success",
         duration: 3000,
-        isClosable: true
+        isClosable: true,
       });
-      send("RESET");
     }
   });
+
+  const {
+    context: { product },
+  } = current;
 
   function updateField(name: keyof typeof initialProduct, value: any) {
     send({
       type: "CHANGE",
-      data: { ...product, [name]: value }
+      data: { ...product, [name]: value },
     });
   }
 
@@ -122,21 +99,17 @@ export const CreateProduct: React.FC = () => {
     updateField("image", base64Image);
   }
 
-  async function createProduct(e: React.ChangeEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (current.matches("saving")) return;
-
-    send("SAVE");
-
+  async function createProduct() {
     const now = new Date().getTime();
 
-    await add({
-      ...(product as Product),
-      id: now,
-      timestamp: now
+    sendProductEvent({
+      type: "ADD",
+      data: {
+        ...(product as Product),
+        id: now,
+        timestamp: now,
+      },
     });
-
-    send("SAVED");
   }
 
   return (
@@ -150,10 +123,13 @@ export const CreateProduct: React.FC = () => {
       margin="auto"
     >
       <form
-        onSubmit={createProduct}
+        onSubmit={e => {
+          e.preventDefault();
+          createProduct();
+        }}
         autoComplete="off"
         style={{
-          width: "100%"
+          width: "100%",
         }}
       >
         <Flex
@@ -182,7 +158,7 @@ export const CreateProduct: React.FC = () => {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="valor">Valor</FormLabel>
+              <CustomFormLabel htmlFor="valor">Valor</CustomFormLabel>
               <CustomInput
                 id="valor"
                 value={product?.price ?? ""}
@@ -203,21 +179,20 @@ export const CreateProduct: React.FC = () => {
             </CustomFormLabel>
             <ImagePicker
               onChange={updateImage}
-              dispose={current.matches("saved")}
+              dispose={state.matches("created")}
             />
           </Flex>
           <Box w="100%">
             <Button
-              isDisabled={current.matches("saving")}
+              isDisabled={state.matches("creating")}
               type="submit"
               variantColor="teal"
               size="md"
               marginTop="32px"
               w="100%"
               leftIcon={
-                !current.matches("saving")
-                  ? "add"
-                  : () => (
+                state.matches("creating")
+                  ? () => (
                       <CircularProgress
                         isIndeterminate
                         color="teal"
@@ -225,9 +200,10 @@ export const CreateProduct: React.FC = () => {
                         marginRight="10px"
                       />
                     )
+                  : "add"
               }
             >
-              {!current.matches("saving") ? "Adicionar" : "Adicionando"}
+              {state.matches("creating") ? "Adicionando" : "Adicionar"}
             </Button>
           </Box>
         </Flex>

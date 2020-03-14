@@ -1,10 +1,10 @@
 import React from "react";
 import { Box, Flex, Heading, Button, useColorMode } from "@chakra-ui/core";
-import { useProductsActions } from "../../Context/Products";
+import { useProductsEvents } from "../../Context/Products";
 import { ColorModeButton } from "../../Components/ColorModeButton";
 
 export const Configurations: React.FC = () => {
-  const { eraseData } = useProductsActions();
+  const send = useProductsEvents();
   const { colorMode } = useColorMode();
 
   return (
@@ -25,7 +25,15 @@ export const Configurations: React.FC = () => {
       <Box w="100%" maxW="500" justifyContent="center" mt="32px">
         <Flex justifyContent="center" alignItems="center" flexDir="column">
           <ColorModeButton />
-          <Button onClick={() => eraseData()} size="lg" variantColor="red">
+          <Button
+            onClick={() =>
+              send({
+                type: "ERASE",
+              })
+            }
+            size="lg"
+            variantColor="red"
+          >
             Exluir compras salvas
           </Button>
         </Flex>

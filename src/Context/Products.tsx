@@ -1,22 +1,18 @@
 import React from "react";
-import { set, del, clear } from "idb-keyval";
-import { Product } from "../Interfaces/Product";
 import { useMachine } from "@xstate/react";
 import { productsMachine, ProductState, ProductEvent } from "./productsMachine";
 
 const stateContext = React.createContext<ProductState | undefined>(undefined);
-const dispatchContext = React.createContext<
-  React.Dispatch<ProductEvent> | undefined
->(undefined);
+const eventContext = React.createContext<ProductEvent | undefined>(undefined);
 
 export const ProductsProvider: React.FC = props => {
   const [state, send] = useMachine(productsMachine);
 
   return (
     <stateContext.Provider value={state}>
-      <dispatchContext.Provider value={send}>
+      <eventContext.Provider value={send}>
         {props.children}
-      </dispatchContext.Provider>
+      </eventContext.Provider>
     </stateContext.Provider>
   );
 };
@@ -32,45 +28,13 @@ export const useProducts = () => {
   return state;
 };
 
-export const useProductsActions = () => {
-  const send = React.useContext(dispatchContext);
+export const useProductsEvents = () => {
+  const send = React.useContext(eventContext);
 
   if (!send)
     throw new Error(
-      "useProductsActions must be used inside a ProductsProvider context"
+      "useProductsEvents must be used inside a ProductsProvider context"
     );
 
-  const add = async (product: Product) => {
-    await set(product.id, product);
-
-    send({
-      type: "ADD",
-      product
-    });
-
-    return product;
-  };
-
-  const remove = async (product: Product) => {
-    await del(product.id);
-
-    send({
-      type: "REMOVE",
-      product
-    });
-  };
-
-  const eraseData = async () => {
-    await clear();
-
-    send({
-      type: "RESET"
-    });
-  };
-
-  return {
-    add,
-    remove,
-    eraseData
-  };
+  return send;
 };

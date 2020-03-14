@@ -1,6 +1,6 @@
-import { Machine, assign, State } from "xstate";
+import { Machine, assign, State, Interpreter } from "xstate";
 import { Product } from "../Interfaces/Product";
-import { keys, get } from "idb-keyval";
+import { products } from "../Services/Product";
 
 interface ProductContext {
   products: Product[];
@@ -10,25 +10,77 @@ interface ProductSchema {
   states: {
     fetching: {};
     ready: {};
+    deleting: {};
+    deleted: {};
+    creating: {};
+    created: {};
+    erasing: {};
   };
 }
 
-type AddProduct = { type: "ADD"; product: Product };
-type SetProduct = { type: "SET_PRODUCTS"; data: Product[] };
+type AddProduct = {
+  type: "ADD";
+  data: Product;
+};
 
-export type ProductEvent =
-  | SetProduct
+type SetProducts = {
+  type: "SET_PRODUCTS";
+  data: Product[];
+};
+
+type RemoveProduct = {
+  type: "REMOVE";
+  data: Product;
+};
+
+type FetchProducts = {
+  type: "FETCH";
+};
+
+type EraseProducts = {
+  type: "ERASE";
+};
+
+type ProductEvents =
+  | SetProducts
   | AddProduct
-  | { type: "REMOVE"; product: Product }
-  | { type: "FETCH" }
-  | { type: "RESET" };
+  | RemoveProduct
+  | FetchProducts
+  | EraseProducts;
 
-export type ProductState = State<ProductContext, ProductEvent>;
+export type ProductState = State<ProductContext, ProductEvents>;
+export type ProductEvent = Interpreter<
+  ProductContext,
+  any,
+  ProductEvents
+>["send"];
+
+const setProducts = assign<ProductContext, ProductEvents>((_ctx, evt) => ({
+  products: (evt as SetProducts).data,
+}));
+
+const createProduct = assign<ProductContext, ProductEvents>({
+  products: ({ products }, evt) => [...products, (evt as AddProduct).data],
+});
+
+const deleteProduct = assign<ProductContext, ProductEvents>({
+  products: ({ products }, evt) => {
+    products.splice(
+      products.findIndex(p => p.id === (evt as RemoveProduct).data.id),
+      1
+    );
+    return products;
+  },
+});
+
+const eraseProducts = assign<ProductContext, ProductEvents>({
+  products: () => [],
+});
 
 export const productsMachine = Machine<
   ProductContext,
   ProductSchema,
-  ProductEvent
+  ProductEvents
 >(
   {
     id: "products",
@@ -40,7 +92,7 @@ export const productsMachine = Machine<
       fetching: {
         invoke: {
           id: "fetchProducts",
-          src: _ctx => fetchProducts(),
+          src: _ctx => products.fetch(),
           onDone: {
             target: "ready",
             actions: ["setProducts"],
@@ -50,19 +102,48 @@ export const productsMachine = Machine<
       ready: {
         on: {
           FETCH: "fetching",
-          ADD: {
-            target: "fetching",
-            actions: ["addProduct"],
+          ADD: "creating",
+          REMOVE: "deleting",
+          ERASE: "erasing",
+        },
+      },
+      creating: {
+        invoke: {
+          id: "creatingProduct",
+          src: (_ctx, evt) => products.create((evt as AddProduct).data),
+          onDone: {
+            target: "created",
+            actions: ["createProduct"],
           },
-          REMOVE: {
-            target: "fetching",
-            actions: ["removeProduct"],
+        },
+      },
+      created: {
+        after: {
+          1000: "ready",
+        },
+      },
+      deleting: {
+        invoke: {
+          id: "deletingProduct",
+          src: (_ctx, evt) => products.remove((evt as RemoveProduct).data),
+          onDone: {
+            target: "deleted",
+            actions: ["deleteProduct"],
           },
-          RESET: {
-            actions: assign({
-              products: _ctx => [],
-            }),
-            target: "fetching",
+        },
+      },
+      deleted: {
+        after: {
+          1000: "ready",
+        },
+      },
+      erasing: {
+        invoke: {
+          id: "erasingData",
+          src: _ctx => products.erase(),
+          onDone: {
+            target: "ready",
+            actions: ["eraseData"],
           },
         },
       },
@@ -70,33 +151,10 @@ export const productsMachine = Machine<
   },
   {
     actions: {
-      addProduct: assign({
-        products: ({ products }, evt) => [
-          ...products,
-          (evt as AddProduct).product,
-        ],
-      }),
-      removeProduct: assign({
-        products: ({ products }, evt) => {
-          products.splice(
-            products.findIndex(p => p.id === (evt as AddProduct).product.id),
-            1
-          );
-          return products;
-        },
-      }),
-      setProducts: assign({
-        products: (_ctx, evt) => (evt as SetProduct).data || _ctx.products,
-      }),
+      setProducts,
+      createProduct,
+      deleteProduct,
+      eraseProducts,
     },
   }
 );
-
-async function fetchProducts() {
-  const allProductsIds = await keys();
-  const products = await Promise.all<Product>(
-    allProductsIds.map(id => get(id))
-  );
-
-  return products;
-}

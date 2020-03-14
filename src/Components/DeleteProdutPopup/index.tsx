@@ -7,10 +7,10 @@ import {
   AlertDialogOverlay,
   Button,
   useToast,
-  useColorMode
+  useColorMode,
 } from "@chakra-ui/core";
 import React from "react";
-import { useProductsActions } from "../../Context/Products";
+import { useProductsEvents, useProducts } from "../../Context/Products";
 import { Product } from "../../Interfaces/Product";
 
 interface Props {
@@ -18,15 +18,27 @@ interface Props {
 }
 
 export const DeleteProductPopup: React.FC<Props> = props => {
-  const [isOpen, setIsOpen] = React.useState();
+  const [isOpen, setIsOpen] = React.useState(false);
+  const state = useProducts();
   const cancelRef = React.useRef();
   const toast = useToast();
-  const { remove } = useProductsActions();
+  const sendProductEvent = useProductsEvents();
   const { colorMode } = useColorMode();
   const { product } = props;
   const color = { light: "gray.800", dark: "white" };
-
   const onClose = () => setIsOpen(false);
+
+  React.useEffect(() => {
+    if (state.matches("deleted")) {
+      toast({
+        title: `Item removido.`,
+        description: `O item ${product.name} foi removido das compras salvas.`,
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  });
 
   return (
     <>
@@ -69,15 +81,7 @@ export const DeleteProductPopup: React.FC<Props> = props => {
             <Button
               variantColor="red"
               onClick={async () => {
-                await remove(product);
-
-                toast({
-                  title: `Item removido.`,
-                  description: `O item ${product.name} foi removido das compras salvas.`,
-                  status: "warning",
-                  duration: 3000,
-                  isClosable: true
-                });
+                sendProductEvent({ type: "REMOVE", data: product });
               }}
               ml={3}
             >
