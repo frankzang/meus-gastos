@@ -1,115 +1,70 @@
 import React from "react";
-import { useProductsEvents, useProducts } from "../../Context/Products";
+import { useProducts } from "../../State/Products";
 import {
   Button,
+  FormLabel,
   FormControl,
   FormHelperText,
   Flex,
+  useToast,
   Box,
   CircularProgress,
-  useToast,
 } from "@chakra-ui/core";
 import { toBase64 } from "../../Utils/toBase64";
 import { CustomInput } from "../../Components/CustomInput";
 import { CustomFormLabel } from "../../Components/CustomFormLabel";
 import { CustomHeading } from "../../Components/Headings";
 import { ImagePicker } from "../../Components/ImagePicker";
-import { Machine, assign } from "xstate";
-import { Product } from "../../Interfaces/Product";
-import { useMachine } from "@xstate/react";
-
-interface Context {
-  product: Partial<Product>;
-}
-
-interface Schema {
-  states: {
-    idle: {};
-  };
-}
-
-type Actions = { type: "CHANGE"; data: Partial<Product> } | { type: "RESET" };
-
-const initialProduct: Partial<Product> = {
-  id: 0,
-};
-
-const productMachine = Machine<Context, Schema, Actions>({
-  id: "products",
-  initial: "idle",
-  context: {
-    product: { ...initialProduct },
-  },
-  states: {
-    idle: {
-      on: {
-        CHANGE: {
-          actions: assign({
-            product: (_ctx, evt) => evt.data,
-          }),
-        },
-        RESET: {
-          actions: assign({
-            product: _ctx => {
-              return initialProduct;
-            },
-          }),
-        },
-      },
-    },
-  },
-});
 
 export const CreateProduct: React.FC = () => {
-  const [current, send] = useMachine(productMachine);
-  const state = useProducts();
-  const sendProductEvent = useProductsEvents();
+  const { add } = useProducts();
+  const [name, setName] = React.useState("");
+  const [price, setPrice] = React.useState("");
+  const [image, setImage] = React.useState<File>();
+  const [resetImage, setResetImage] = React.useState<Boolean>(false);
+  const [isCreatingProduct, setIsCreatingProduct] = React.useState(false);
   const toast = useToast();
 
-  React.useEffect(() => {
-    if (state.matches("created")) {
-      toast({
-        title: `Compra adicionada.`,
-        description: `O item ${product?.name} foi adicionado as compras salvas.`,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  });
-
-  const {
-    context: { product },
-  } = current;
-
-  function updateField(name: keyof typeof initialProduct, value: any) {
-    send({
-      type: "CHANGE",
-      data: { ...product, [name]: value },
-    });
+  function updateName(event: React.ChangeEvent<HTMLInputElement>) {
+    setName(event.target.value);
   }
 
-  async function updateImage(image?: File) {
+  function updatePrice(event: React.ChangeEvent<HTMLInputElement>) {
+    setPrice(event.target.value);
+  }
+
+  async function createProduct(e: React.ChangeEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (isCreatingProduct) return;
+
+    setIsCreatingProduct(true);
+    const time = new Date().getTime();
     let base64Image: any = "";
 
     if (image) {
       base64Image = await toBase64(image);
     }
 
-    updateField("image", base64Image);
-  }
-
-  async function createProduct() {
-    const now = new Date().getTime();
-
-    sendProductEvent({
-      type: "ADD",
-      data: {
-        ...(product as Product),
-        id: now,
-        timestamp: now,
-      },
+    await add({
+      id: time,
+      timestamp: time,
+      name,
+      price: Number.parseFloat(price),
+      image: base64Image,
     });
+
+    toast({
+      title: `Compra adicionada.`,
+      description: `O item ${name} foi adicionado às compras salvas.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+
+    setName("");
+    setPrice("");
+    setIsCreatingProduct(false);
+    setResetImage(true);
   }
 
   return (
@@ -123,10 +78,7 @@ export const CreateProduct: React.FC = () => {
       margin="auto"
     >
       <form
-        onSubmit={e => {
-          e.preventDefault();
-          createProduct();
-        }}
+        onSubmit={createProduct}
         autoComplete="off"
         style={{
           width: "100%",
@@ -147,10 +99,8 @@ export const CreateProduct: React.FC = () => {
               <CustomInput
                 autoFocus
                 id="nome"
-                value={product?.name ?? ""}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  updateField("name", e.currentTarget.value)
-                }
+                value={name}
+                onChange={updateName}
                 placeholder="ex. tomate"
                 size="md"
                 width="100%"
@@ -158,13 +108,11 @@ export const CreateProduct: React.FC = () => {
               />
             </FormControl>
             <FormControl>
-              <CustomFormLabel htmlFor="valor">Valor</CustomFormLabel>
+              <FormLabel htmlFor="valor">Valor</FormLabel>
               <CustomInput
                 id="valor"
-                value={product?.price ?? ""}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  updateField("price", +e.currentTarget.value)
-                }
+                value={price}
+                onChange={updatePrice}
                 placeholder="ex: 2,50"
                 type="number"
                 size="md"
@@ -178,32 +126,25 @@ export const CreateProduct: React.FC = () => {
               Foto (opcional)
             </CustomFormLabel>
             <ImagePicker
-              onChange={updateImage}
-              dispose={state.matches("created")}
+              onChange={(file) => {
+                setResetImage(false);
+                setImage(file);
+              }}
+              dispose={resetImage}
             />
           </Flex>
           <Box w="100%">
             <Button
-              isDisabled={state.matches("creating")}
               type="submit"
               variantColor="teal"
               size="md"
               marginTop="32px"
               w="100%"
-              leftIcon={
-                state.matches("creating")
-                  ? () => (
-                      <CircularProgress
-                        isIndeterminate
-                        color="teal"
-                        size="20px"
-                        marginRight="10px"
-                      />
-                    )
-                  : "add"
-              }
+              isLoading={isCreatingProduct}
+              loadingText="Adicionando"
+              leftIcon="add"
             >
-              {state.matches("creating") ? "Adicionando" : "Adicionar"}
+              Adicionar
             </Button>
           </Box>
         </Flex>

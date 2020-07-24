@@ -1,18 +1,18 @@
 import React from "react";
 import { Box, Tag, Flex, Image } from "@chakra-ui/core";
-import { Product } from "../../Interfaces/Product";
 import { Link } from "react-router-dom";
 import { Routes } from "../../Routes";
 import { currencyformatter, dateformatter } from "../../Utils/formatters";
 import styles from "./index.module.css";
 import { CustomHeading } from "../Headings";
 import { CustomText } from "../CustomText";
+import { IProduct } from "../../State/Products";
 
 interface Props {
-  product: Product;
+  product: IProduct;
 }
 
-export const ProductCard: React.FC<Props> = props => {
+export const ProductCard: React.FC<Props> = (props) => {
   const { product } = props;
 
   return (
