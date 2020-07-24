@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Box, Flex, CircularProgress } from "@chakra-ui/core";
-import { useProducts } from "../../Context/Products";
+import { useProducts } from "../../State/Products";
 import { ProductCard } from "../../Components/ProductCard";
 import { StatusHeader } from "../../Components/Status";
 import { SearchBox } from "../../Components/SearchBox";
 import { CustomHeading } from "../../Components/Headings";
 
 export const Home: React.FC = () => {
-  const { products, loading } = useProducts();
+  const { products, status } = useProducts();
   const [productsToShow, setProductsToShow] = useState(products);
   const theresProducts = products.length > 0;
 
@@ -18,7 +18,7 @@ export const Home: React.FC = () => {
   const updateProductsToShow = (name: string) => {
     setProductsToShow(
       products.filter(
-        product =>
+        (product) =>
           product && product.name.toLowerCase().includes(name.toLowerCase())
       )
     );
@@ -39,14 +39,14 @@ export const Home: React.FC = () => {
         <Box w="100%" padding="5" maxW="500px" flex="1">
           <SearchBox
             isDisabled={!theresProducts}
-            onChange={e => updateProductsToShow(e.target.value)}
+            onChange={(e) => updateProductsToShow(e.target.value)}
           />
           <Flex
             justifyContent="space-between"
             alignItems="center"
             marginBottom="48px"
           >
-            {loading ? null : (
+            {status === "loading" ? null : (
               <CustomHeading
                 as="h2"
                 size="md"
@@ -59,7 +59,7 @@ export const Home: React.FC = () => {
               </CustomHeading>
             )}
           </Flex>
-          {loading ? (
+          {status === "loading" ? (
             <Flex justifyContent="center">
               <CircularProgress isIndeterminate color="green" />
             </Flex>
@@ -67,7 +67,7 @@ export const Home: React.FC = () => {
             productsToShow
               .filter(Boolean)
               .reverse()
-              .map(product => {
+              .map((product) => {
                 return <ProductCard key={product.id} product={product} />;
               })
           )}

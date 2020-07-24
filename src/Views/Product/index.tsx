@@ -1,38 +1,31 @@
 import { CircularProgress, Flex, Image, Tag } from "@chakra-ui/core";
 import React from "react";
-import { Redirect, RouteChildrenProps } from "react-router-dom";
+import { Redirect, useParams } from "react-router-dom";
 import { DeleteProductPopup } from "../../Components/DeleteProdutPopup";
-import { useProducts } from "../../Context/Products";
+import { useProducts } from "../../State/Products";
 import { Routes } from "../../Routes";
 import { currencyformatter, dateformatter } from "../../Utils/formatters";
 import styles from "./index.module.css";
 import { CustomHeading } from "../../Components/Headings";
 import { CustomText } from "../../Components/CustomText";
 
-interface RouteProps {
-  productId: string;
-}
-
-interface Props extends RouteChildrenProps<RouteProps> {}
-
-export const ProductPage: React.FC<Props> = props => {
-  const { products, loading } = useProducts();
-  const productId = props.match?.params.productId || "0";
-
+export const ProductPage: React.FC = () => {
+  const { products, status } = useProducts();
+  const { productId } = useParams<{ productId: string }>();
   const product = products.find(
-    product => product.id === Number.parseInt(productId)
+    (product) => product.id === Number.parseInt(productId)
   );
 
-  if (loading) {
+  if (!product) {
+    return <Redirect to={Routes.HOME} />;
+  }
+
+  if (status === "loading") {
     return (
       <Flex justifyContent="center" padding="8">
         <CircularProgress isIndeterminate color="green" />
       </Flex>
     );
-  }
-
-  if (!product) {
-    return <Redirect to={Routes.HOME} />;
   }
 
   return (

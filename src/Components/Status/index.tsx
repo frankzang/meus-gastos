@@ -1,13 +1,13 @@
 import React from "react";
 import { Flex, Text, IconButton, CircularProgress } from "@chakra-ui/core";
-import { useProducts } from "../../Context/Products";
+import { useProducts } from "../../State/Products";
 import { useHistory } from "react-router-dom";
 import { Routes } from "../../Routes";
 import { currencyformatter } from "../../Utils/formatters";
 import { CustomHeading } from "../Headings";
 
 export const StatusHeader: React.FC = () => {
-  const { products, loading } = useProducts();
+  const { products, status } = useProducts();
   const history = useHistory();
 
   const date = new Date();
@@ -15,7 +15,7 @@ export const StatusHeader: React.FC = () => {
   const year = date.getFullYear();
 
   const totalSpent = products
-    .filter(product => {
+    .filter((product) => {
       const date = new Date(product.timestamp);
       const pMonth = date.getMonth();
       const pYear = date.getFullYear();
@@ -28,7 +28,7 @@ export const StatusHeader: React.FC = () => {
 
   return (
     <Flex w="100%" alignItems="flex-end">
-      {loading ? (
+      {status === "loading" ? (
         <Flex justifyContent="center">
           <CircularProgress isIndeterminate color="green"></CircularProgress>
         </Flex>
@@ -50,18 +50,6 @@ export const StatusHeader: React.FC = () => {
             size="sm"
             marginBottom="10px"
           />
-          <IconButton
-            onClick={() => {
-              history.push(Routes.CONFIGURATIONS);
-            }}
-            icon="settings"
-            aria-label="configurações"
-            alignSelf="flex-end"
-            marginLeft="auto"
-            marginBottom="auto"
-            variant="link"
-            variantColor="gray"
-          ></IconButton>
         </>
       )}
     </Flex>

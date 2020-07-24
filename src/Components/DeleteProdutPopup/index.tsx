@@ -7,21 +7,20 @@ import {
   AlertDialogOverlay,
   Button,
   useToast,
-  useColorMode
+  useColorMode,
 } from "@chakra-ui/core";
 import React from "react";
-import { useProductsActions } from "../../Context/Products";
-import { Product } from "../../Interfaces/Product";
+import { useProducts, IProduct } from "../../State/Products";
 
 interface Props {
-  product: Product;
+  product: IProduct;
 }
 
-export const DeleteProductPopup: React.FC<Props> = props => {
-  const [isOpen, setIsOpen] = React.useState();
+export const DeleteProductPopup: React.FC<Props> = (props) => {
+  const [isOpen, setIsOpen] = React.useState(false);
   const cancelRef = React.useRef();
   const toast = useToast();
-  const { remove } = useProductsActions();
+  const { remove } = useProducts();
   const { colorMode } = useColorMode();
   const { product } = props;
   const color = { light: "gray.800", dark: "white" };
@@ -76,7 +75,7 @@ export const DeleteProductPopup: React.FC<Props> = props => {
                   description: `O item ${product.name} foi removido das compras salvas.`,
                   status: "warning",
                   duration: 3000,
-                  isClosable: true
+                  isClosable: true,
                 });
               }}
               ml={3}

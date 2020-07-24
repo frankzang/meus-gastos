@@ -1,5 +1,5 @@
 import React from "react";
-import { useProductsActions } from "../../Context/Products";
+import { useProducts } from "../../State/Products";
 import {
   Button,
   FormLabel,
@@ -8,7 +8,7 @@ import {
   Flex,
   useToast,
   Box,
-  CircularProgress
+  CircularProgress,
 } from "@chakra-ui/core";
 import { toBase64 } from "../../Utils/toBase64";
 import { CustomInput } from "../../Components/CustomInput";
@@ -17,7 +17,7 @@ import { CustomHeading } from "../../Components/Headings";
 import { ImagePicker } from "../../Components/ImagePicker";
 
 export const CreateProduct: React.FC = () => {
-  const { add } = useProductsActions();
+  const { add } = useProducts();
   const [name, setName] = React.useState("");
   const [price, setPrice] = React.useState("");
   const [image, setImage] = React.useState<File>();
@@ -35,13 +35,10 @@ export const CreateProduct: React.FC = () => {
 
   async function createProduct(e: React.ChangeEvent<HTMLFormElement>) {
     e.preventDefault();
-
     if (isCreatingProduct) return;
 
     setIsCreatingProduct(true);
-
     const time = new Date().getTime();
-
     let base64Image: any = "";
 
     if (image) {
@@ -53,15 +50,15 @@ export const CreateProduct: React.FC = () => {
       timestamp: time,
       name,
       price: Number.parseFloat(price),
-      image: base64Image
+      image: base64Image,
     });
 
     toast({
       title: `Compra adicionada.`,
-      description: `O item ${name} foi adicionado as compras salvas.`,
+      description: `O item ${name} foi adicionado às compras salvas.`,
       status: "success",
       duration: 3000,
-      isClosable: true
+      isClosable: true,
     });
 
     setName("");
@@ -84,7 +81,7 @@ export const CreateProduct: React.FC = () => {
         onSubmit={createProduct}
         autoComplete="off"
         style={{
-          width: "100%"
+          width: "100%",
         }}
       >
         <Flex
@@ -129,7 +126,7 @@ export const CreateProduct: React.FC = () => {
               Foto (opcional)
             </CustomFormLabel>
             <ImagePicker
-              onChange={file => {
+              onChange={(file) => {
                 setResetImage(false);
                 setImage(file);
               }}
@@ -138,28 +135,16 @@ export const CreateProduct: React.FC = () => {
           </Flex>
           <Box w="100%">
             <Button
-              isDisabled={isCreatingProduct}
               type="submit"
               variantColor="teal"
               size="md"
               marginTop="32px"
               w="100%"
-              leftIcon={
-                !isCreatingProduct
-                  ? "add"
-                  : () => {
-                      return (
-                        <CircularProgress
-                          isIndeterminate
-                          color="teal"
-                          size="20px"
-                          marginRight="10px"
-                        />
-                      );
-                    }
-              }
+              isLoading={isCreatingProduct}
+              loadingText="Adicionando"
+              leftIcon="add"
             >
-              {isCreatingProduct ? "Adicionando" : "Adicionar"}
+              Adicionar
             </Button>
           </Box>
         </Flex>
